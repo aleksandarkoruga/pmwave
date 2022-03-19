@@ -1,0 +1,26 @@
+class:: PMWave
+summary:: Physical modelling plate
+related:: TODO
+categories:: UGens>TODO
+
+description::
+
+Physical modelling plate
+
+
+classmethods::
+
+method::ar, kr
+
+argument::TODO
+
+argument::TODO
+
+
+examples::
+
+code::
+
+{ PMWave.ar(/* TODO */) }.play
+
+::
