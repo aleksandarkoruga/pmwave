@@ -9,7 +9,8 @@
 cmake_minimum_required(VERSION 3.5)
 set(project_name "PMWave")
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules ${CMAKE_MODULE_PATH})
-set(CMAKE_CXX_STANDARD 11)
+# SuperCollider's plugin headers (3.14+) use C++14/17 features
+set(CMAKE_CXX_STANDARD 17)
 
 ####################################################################################################
 # load modules

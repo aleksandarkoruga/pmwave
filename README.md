@@ -4,6 +4,8 @@ Author: Aleksandar Koruga
 
 Physical modelling plate
 
+Revised, optimized, and overhauled version of PMWave, made with Claude.
+
 ### Requirements
 
 - CMake >= 3.5

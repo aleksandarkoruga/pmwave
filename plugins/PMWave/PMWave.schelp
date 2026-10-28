@@ -1,26 +1,72 @@
 class:: PMWave
 summary:: Physical modelling plate
-related:: TODO
-categories:: UGens>TODO
+related:: Classes/Pluck
+categories:: UGens>PhysicalModels
 
 description::
 
-Physical modelling plate
+A 4x4 toroidal digital waveguide mesh of 64 delay lines (both directions of 32 waveguides). Every delay line has
+its own length, glide time and wander, and glides towards its target, so the plate can be stretched in real time. Rails are read with cubic
+interpolation, and losses are applied per rail and scaled with the rail length, so the decay times stay the same
+whatever the plate size.
+
+Rail lengths range from 0.1 ms to 40 ms. The rail buffers come from the server's real-time memory: about 0.5 MB
+per instance at 44.1/48 kHz and 1 MB at 88.2/96 kHz. Raise code::ServerOptions.memSize:: for many instances; if
+the allocation fails the UGen posts an error and outputs silence.
+
+The excitation enters at junction (0,0) without damping it; two channels are picked up at (1,2) and (0,2).
 
 
 classmethods::
 
-method::ar, kr
+method::ar
 
-argument::TODO
+argument::in
+Excitation, injected at junction (0,0).
 
-argument::TODO
+argument::decay
+Low-frequency decay time (T60) in seconds. Read once per control block.
+
+argument::time
+Plate size, 0..1, on an exponential scale: 0 gives 40 ms rails (a large, dense, room-like plate), 1 gives 0.1 ms
+rails. Equal steps are equal pitch intervals (about 0.86 octave per 0.1).
+
+argument::glide
+How fast the plate follows a new code::time::, in seconds (see code::glideMode::). Read once per control block.
+However short, a rail never changes by more than one sample per sample.
+
+argument::hfDecay
+High-frequency decay time (T60 at Nyquist) in seconds. Read once per control block.
+
+argument::rand1
+Spread of the 64 delay line lengths (each with its own random value), as a ratio: each sits within ×/÷ (1 + rand1) of the size set by
+code::time:: (0 = regular mesh, a pitched comb; 0.15 and above = irregular, diffuse).
+
+argument::rand2
+Spread of the delay lines' glide times, as a ratio: ×/÷ (1 + rand2), so the plate deforms while it is stretched.
+Read once per control block.
+
+argument::wander
+Depth of a slow, independent random modulation (0.1-0.4 Hz) of every delay line length, as a ratio: ×/÷ (1 + wander).
+Small values (0.002-0.02) keep the modes moving like a modulated reverb; larger values become audible chorus.
+
+argument::glideMode
+0: lag. code::glide:: is the time to arrive (60 dB in log length, like link::Classes/Lag::) whatever the distance;
+the pitch bend of what is ringing is strongest at the start of the glide.
+1: constant rate. Every delay line moves at a steady speed in log length, code::glide:: seconds per octave, so
+larger stretches take longer and the bend stays steady, even in pitch. Read once per control block.
 
 
 examples::
 
 code::
 
-{ PMWave.ar(/* TODO */) }.play
+{ PMWave.ar(Impulse.ar(0.5) * 0.5, decay: 4, time: 0.4, hfDecay: 0.8) }.play
+
+// large and diffuse
+{ PMWave.ar(Impulse.ar(0.25) * 0.5, decay: 6, time: 0.05, hfDecay: 0.6, rand1: 0.25, wander: 0.01) }.play
+
+// stretch the plate while it rings
+{ PMWave.ar(Impulse.ar(0.25) * 0.5, 6, LFNoise1.ar(0.2).range(0.1, 0.7), 1.5, 1.5, 0.2, 0.5) }.play
 
 ::
